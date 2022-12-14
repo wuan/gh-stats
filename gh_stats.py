@@ -48,7 +48,7 @@ def download_statistics(statsd_client, username, reponame):
         statsd_client.gauge("downloads.total", total_downloads, tags=metric_tags)
     for extension, download_count in total_downloads_per_extension.items():
         if download_count > 0:
-            print(f"    total downloads: {extension} {download_count}")
+            print(f"    {extension} downloads: {download_count}")
             metric_tags["ext"] = extension
             statsd_client.gauge("downloads.by_ext", total_downloads, tags=metric_tags)
 
