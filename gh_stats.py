@@ -73,8 +73,8 @@ def clones_statistics(statsd_client, username, reponame):
     for clones in repo.get_clones_traffic()["clones"]:
         if clones.timestamp.date() == today:
             print(f"    clones today: count: {clones.count}, unique: {clones.uniques}")
-            statsd_client.gauge("views.count", clones.count, tags=metric_tags)
-            statsd_client.gauge("views.uniques", clones.uniques, tags=metric_tags)
+            statsd_client.gauge("clones.count", clones.count, tags=metric_tags)
+            statsd_client.gauge("clones.uniques", clones.uniques, tags=metric_tags)
 
 
 def stargazers_statistics(statsd_client, username, reponame):
