@@ -8,6 +8,8 @@ Collect some GitHub repo statistics
 
 Views and clones require a token with repo write access to work.
 
+The information is pushed to a tags enabled StatsD service on default port 8125 on `localhost`.
+
 Token useage is encouraged to overcome the API limit for requests without token
 
 ## Usage
