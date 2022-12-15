@@ -53,7 +53,7 @@ def download_statistics(statsd_client, username, reponame):
             statsd_client.gauge("downloads.by_ext", total_downloads, tags=metric_tags)
 
 
-def views_statistics(statsd_client, username, reponame):
+def views_statistics(statsd_client, username, reponame, today):
     metric_tags = {
         "username": username,
         "repository": reponame
@@ -65,7 +65,7 @@ def views_statistics(statsd_client, username, reponame):
             statsd_client.gauge("views.uniques", views.uniques, tags=metric_tags)
 
 
-def clones_statistics(statsd_client, username, reponame):
+def clones_statistics(statsd_client, username, reponame, today):
     metric_tags = {
         "username": username,
         "repository": reponame
@@ -93,7 +93,8 @@ if __name__ == "__main__":
 
     usernames = list_from_string(os.environ.get("GH_USERNAMES", ""))
 
-    today = datetime.datetime.utcnow().date()
+    today_timezone = datetime.timezone(datetime.timedelta(hours=-4))
+    today = datetime.datetime.now(tz=today_timezone).date()
 
     for username in usernames:
         g = Github(login_or_token=os.environ["GH_TOKEN"])
@@ -103,7 +104,7 @@ if __name__ == "__main__":
         for repo in user.get_repos():
             print(f"### {repo.name}")
 
-            views_statistics(statsd_client, username, repo.name)
-            clones_statistics(statsd_client, username, repo.name)
+            views_statistics(statsd_client, username, repo.name, today)
+            clones_statistics(statsd_client, username, repo.name, today)
             download_statistics(statsd_client, username, repo.name)
             stargazers_statistics(statsd_client, username, repo.name)
