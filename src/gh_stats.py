@@ -97,14 +97,16 @@ if __name__ == "__main__":
     today = datetime.datetime.now(tz=today_timezone).date()
 
     for username in usernames:
-        g = Github(login_or_token=os.environ["GH_TOKEN"])
+        github_token = os.environ.get("GH_TOKEN")
+        g = Github(login_or_token=github_token)
         # get that user by username
         user = g.get_user(username)
 
         for repo in user.get_repos():
             print(f"### {repo.name}")
 
-            views_statistics(statsd_client, username, repo.name, today)
-            clones_statistics(statsd_client, username, repo.name, today)
+            if github_token is not None:
+                views_statistics(statsd_client, username, repo.name, today)
+                clones_statistics(statsd_client, username, repo.name, today)
             download_statistics(statsd_client, username, repo.name)
             stargazers_statistics(statsd_client, username, repo.name)

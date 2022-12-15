@@ -33,4 +33,4 @@ before_script:
 
 run:
   script:
-    python gh_stats.py
+    python src/gh_stats.py
