@@ -6,6 +6,7 @@ from collections import defaultdict
 import statsd
 from github import Github
 
+
 #
 # What could we add here as well?
 #
@@ -88,6 +89,30 @@ def stargazers_statistics(statsd_client, username, reponame):
         statsd_client.gauge("stargazers", stargazers_count, tags=metric_tags)
 
 
+def issues_statistics(statsd_client, username, reponame):
+    issues_count = repo.get_issues(state="open").totalCount
+    if issues_count > 0:
+        metric_tags = {
+            "username": username,
+            "repository": reponame,
+            "state": "open",
+        }
+        print("    issues", issues_count)
+        statsd_client.gauge("issues", issues_count, tags=metric_tags)
+
+
+def pulls_statistics(statsd_client, username, reponame):
+    pulls = repo.get_pulls(state="open").totalCount
+    if pulls > 0:
+        metric_tags = {
+            "username": username,
+            "repository": reponame,
+            "state": "open",
+        }
+        print("    pulls", pulls)
+        statsd_client.gauge("pulls", pulls, tags=metric_tags)
+
+
 if __name__ == "__main__":
     statsd_client = statsd.StatsClient('localhost', 8125, prefix="github_stats")
 
@@ -103,10 +128,15 @@ if __name__ == "__main__":
         user = g.get_user(username)
 
         for repo in user.get_repos():
+            if repo.private:
+                continue
+
             print(f"### {repo.name}")
 
             if github_token is not None:
                 views_statistics(statsd_client, username, repo.name, today)
                 clones_statistics(statsd_client, username, repo.name, today)
+            issues_statistics(statsd_client, username, repo.name)
+            pulls_statistics(statsd_client, username, repo.name)
             download_statistics(statsd_client, username, repo.name)
             stargazers_statistics(statsd_client, username, repo.name)
