@@ -78,27 +78,24 @@ def clones_statistics(statsd_client, username, reponame, today):
             statsd_client.gauge("clones.uniques", clones.uniques, tags=metric_tags)
 
 
-def stargazers_statistics(statsd_client, username, reponame):
-    stargazers_count = repo.stargazers_count
-    if stargazers_count > 0:
-        metric_tags = {
-            "username": username,
-            "repository": reponame
-        }
-        print("    stars", stargazers_count)
-        statsd_client.gauge("stargazers", stargazers_count, tags=metric_tags)
+def repo_statistics(statsd_client, username, repo):
+    for count, name in [
+        (repo.stargazers_count, "stargazers"),
+        (repo.forks_count, "forks"),
+        (repo.watchers_count, "watchers"),
+        (repo.network_count, 'network'),
+        (repo.subscribers_count, 'subscribers'),
+        (repo.open_issues_count, 'open_issues'),
+    ]:
+        if count > 0:
+            metric_tags = {
+                "username": username,
+                "repository": repo.name
+            }
+            print(f"    {name}", count)
+            statsd_client.gauge(name, count, tags=metric_tags)
 
 
-def issues_statistics(statsd_client, username, reponame):
-    issues_count = repo.get_issues(state="open").totalCount
-    if issues_count > 0:
-        metric_tags = {
-            "username": username,
-            "repository": reponame,
-            "state": "open",
-        }
-        print("    issues", issues_count)
-        statsd_client.gauge("issues", issues_count, tags=metric_tags)
 
 
 def pulls_statistics(statsd_client, username, reponame):
@@ -136,7 +133,6 @@ if __name__ == "__main__":
             if github_token is not None:
                 views_statistics(statsd_client, username, repo.name, today)
                 clones_statistics(statsd_client, username, repo.name, today)
-            issues_statistics(statsd_client, username, repo.name)
             pulls_statistics(statsd_client, username, repo.name)
             download_statistics(statsd_client, username, repo.name)
-            stargazers_statistics(statsd_client, username, repo.name)
+            repo_statistics(statsd_client, username, repo)
