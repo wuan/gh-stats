@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#/usr/bin/env python
 import datetime
 import os
 from collections import defaultdict
@@ -82,7 +82,6 @@ def repo_statistics(statsd_client, username, repo):
     for count, name in [
         (repo.stargazers_count, "stargazers"),
         (repo.forks_count, "forks"),
-        (repo.watchers_count, "watchers"),
         (repo.network_count, 'network'),
         (repo.subscribers_count, 'subscribers'),
         (repo.open_issues_count, 'open_issues'),
